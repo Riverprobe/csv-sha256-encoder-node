@@ -8,18 +8,26 @@ const inputFilePath = "input.csv";
 const outputFilePath = "output.csv";
 
 function sha256(text) {
-  const hash = crypto.createHash("sha256");
-  hash.update(text);
-  return hash.digest("hex");
+  const msgBuffer = new TextEncoder().encode(text);
+
+  // hash the message
+  const hashBuffer = crypto.createHash("sha256").update(msgBuffer).digest();
+
+  // convert ArrayBuffer to Array
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+  // convert bytes to hex string
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+  return hashHex;
 }
 
 // Function to process and modify data
 function processData(data) {
-  const value = Object.values(data)[0];
-
   // Modify the data as needed; for example, add "Modified" to each cell
   return {
-    Column1: sha256(value),
+    Email: data["Email Address"],
+    Encoded: sha256(data["Email Address"]),
     // Add more columns as needed
   };
 }
